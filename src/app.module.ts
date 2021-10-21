@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PostsModule } from './posts/posts.module';
 import { MongooseConfigService } from './config/mongooseConfigService';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 
 @Module({
@@ -13,7 +15,9 @@ import { MongooseConfigService } from './config/mongooseConfigService';
       imports:[ConfigModule.forRoot({envFilePath:'.development.env'})],
       useClass: MongooseConfigService
   }),
-  PostsModule
+  PostsModule,
+  AuthModule,
+  UsersModule
 ],
     controllers:[AppController],
     providers:[AppService]

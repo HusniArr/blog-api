@@ -1,24 +1,51 @@
-import { Controller, Delete, Get, HttpException, HttpStatus, Param ,Res} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param ,Post,Res,Put, Request, UseGuards} from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
+import * as bcrypt from 'bcrypt';
 
-@Controller('users')
+
+@Controller()
 export class UsersController {
     constructor(private userService : UsersService){}
-    @Delete('/:id')
+    @Delete('users/:id')
     delete(@Param('id') id:string,@Res() res:Response){
         this.userService.delete(id);
         res.status(HttpStatus.OK).send({message:"berhasil dihapus."});
     }
-    @Get('')
+    @Get('users')
     findAll(){
         const user = this.userService.find();
         return user;
     }
-    @Get('/:id')
+    @Get('users/:id')
     findOne(@Param('id') id:string){
         const user = this.userService.findOne(id);
         return user;
         
     }
+    @Put('users/:id')
+    async update(@Param('id') id:string,@Body('username') username:string, @Body('password') password:string , @Body('newpassword') newpassword:string, @Body('email') email:string){
+        const salt = bcrypt.genSaltSync(0);
+       const hash = bcrypt.hashSync(newpassword,salt);
+        const user = await this.userService.findOne(id);
+        if(bcrypt.compareSync(password,user.password)){
+            const result = this.userService.update(id,username,hash,email);
+            return result;     
+        }
+    
+    }
+    @Post('users')
+    async create(@Body('username') username : string, @Body('password') password : string, @Body('email') email : string,@Res() res: Response){
+        const salt = bcrypt.genSaltSync(0);
+        const hash = bcrypt.hashSync(password,salt);
+         const userExists = await this.userService.findByUsername(username);
+         if(userExists){
+             res.status(HttpStatus.CONFLICT).send({message:"username sudah terdaftar."})
+         }else{
+             await this.userService.create(username,hash,email);
+             res.status(HttpStatus.OK).send({message:"Berhasil disimpan"})
+         }
+        
+     }
+  
 }

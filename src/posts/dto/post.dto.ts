@@ -9,7 +9,7 @@ export class PostDto {
     @IsNotEmpty() 
     content:string;
 
-    @IsNumber()
-    userId:number;
+    @IsString()
+    userId:string;
 
 }

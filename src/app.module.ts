@@ -7,6 +7,9 @@ import { PostsModule } from './posts/posts.module';
 import { MongooseConfigService } from './config/mongooseConfigService';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './roles.guard';
+import { CaslModule } from './casl/casl.module';
 
 
 @Module({
@@ -17,9 +20,11 @@ import { UsersModule } from './users/users.module';
   }),
   PostsModule,
   AuthModule,
-  UsersModule
+  UsersModule,
+  CaslModule
 ],
     controllers:[AppController],
-    providers:[AppService]
+    providers:[AppService,{provide:APP_GUARD,useClass:RolesGuard}]
+    // providers:[AppService]
 })
 export class AppModule {}
